@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Auth;
 
 
 class FrontendController extends Controller
@@ -12,6 +13,11 @@ class FrontendController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+     public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     public function index()
     {
        $albums=\App\Album::get();
@@ -47,7 +53,7 @@ class FrontendController extends Controller
      */
     public function show($id)
     {
-        $albumImages=\App\Album::find($id)->load('images','user');
+        $albumImages=\App\Album::find($id)->load('images','user.followers');
         return view('front.show',compact('albumImages'));
     }
 
@@ -84,4 +90,12 @@ class FrontendController extends Controller
     {
         //
     }
+
+     public function followUnfollow($id)
+    {
+        $user=\App\User::find($id);
+         $response=Auth::user()->toggleFollow($user);
+         return $response;
+    }
+
 }

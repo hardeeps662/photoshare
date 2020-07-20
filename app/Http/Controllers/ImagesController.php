@@ -7,7 +7,12 @@ use App\Image;
 use Auth;
 
 class ImagesController extends Controller
-{
+{  
+
+     public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
 	public function getImages($id){
         $images = \App\Image::where('album_id',$id)->get();

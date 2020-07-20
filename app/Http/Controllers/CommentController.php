@@ -7,6 +7,11 @@ use Auth;
 
 class CommentController extends Controller
 {   
+     public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
 	public function getComments($id){
        return \App\Comment::where('album_id',$id)->with('user','replies.user')->get();
 

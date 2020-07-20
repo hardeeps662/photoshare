@@ -6,7 +6,11 @@ use Illuminate\Http\Request;
 use Auth;
 
 class ReplyController extends Controller
-{  
+{   
+     public function __construct()
+    {
+        $this->middleware('auth');
+    }
 	public function getReply($id){
        return \App\Reply::where('comment_id',$id)->with('user')->get();
 

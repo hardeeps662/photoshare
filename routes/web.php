@@ -20,6 +20,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 Auth::routes();
 Route::get('/', 'FrontendController@index');
 Route::get('/user-album/{id}', 'FrontendController@show');
+Route::post('/follow-unfollow/{id}', 'FrontendController@followUnfollow');
 Route::resource('/album', 'AlbumController');
 Route::get('/getalbums', 'AlbumController@getAlbum');
 Route::get('/images/{id}/create', 'ImagesController@create');

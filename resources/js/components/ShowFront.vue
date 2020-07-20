@@ -15,8 +15,8 @@
                 </div>
             </div>
             <div class="mt-3">
-                <h5>Created By : <a href="">{{allAlbums.user.name}}</a></h5>
-                <h4 class="mt-4">{{allAlbums.name}}</h4>
+                <div class="row ml-1 mt-1"><h5 class="mt-1">Created By : <a href="">{{allAlbums.user.name}}</a></h5><button class="btn btn-outline-primary btn-sm ml-3" @click="userFollowUnfollow(allAlbums.user.id)">{{allAlbums.user.followers}}</button></div>
+                <h4 class="mt-4">{{allAlbums.name}}</h4> 
                 <h5>{{allAlbums.description}}</h5>
             </div>
            <div class="container">
@@ -127,6 +127,14 @@
          }
         },
         methods:{
+          userFollowUnfollow(id){
+
+             axios.post('/follow-unfollow/'+id).then(response=>{
+                 console.log(response);
+             }).catch(error=>{
+              console.log(error.response);
+             });
+          },
           ReplyToComment(id){
              this.replyField=id;
             

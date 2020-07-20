@@ -2653,6 +2653,13 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    userFollowUnfollow: function userFollowUnfollow(id) {
+      axios.post('/follow-unfollow/' + id).then(function (response) {
+        console.log(response);
+      })["catch"](function (error) {
+        console.log(error.response);
+      });
+    },
     ReplyToComment: function ReplyToComment(id) {
       this.replyField = id;
     },
@@ -54746,11 +54753,25 @@ var render = function() {
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "mt-3" }, [
-          _c("h5", [
-            _vm._v("Created By : "),
-            _c("a", { attrs: { href: "" } }, [
-              _vm._v(_vm._s(_vm.allAlbums.user.name))
-            ])
+          _c("div", { staticClass: "row ml-1 mt-1" }, [
+            _c("h5", { staticClass: "mt-1" }, [
+              _vm._v("Created By : "),
+              _c("a", { attrs: { href: "" } }, [
+                _vm._v(_vm._s(_vm.allAlbums.user.name))
+              ])
+            ]),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-primary btn-sm ml-3",
+                on: {
+                  click: function($event) {
+                    return _vm.userFollowUnfollow(_vm.allAlbums.user.id)
+                  }
+                }
+              },
+              [_vm._v(_vm._s(_vm.allAlbums.user.followers))]
+            )
           ]),
           _vm._v(" "),
           _c("h4", { staticClass: "mt-4" }, [
