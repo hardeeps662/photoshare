@@ -7,7 +7,7 @@
                     <div class="row p-1 d-flex justify-content-center flex-wrap " >
                         <div class="p-2" v-for="album in allAlbums.images">
                             <div style=" border: 1px solid lightgrey; padding: 5px;" >
-                                <img class="" :src="'/storage/album_image/'+album.photo" width="170px" height="140px" style="border-radius: 1px;">
+                                <img class="" :src="'/storage/album_image/'+album.photo" width="  170px" height="140px" style="border-radius: 1px;">
                                 
                             </div>
                         </div>
@@ -15,10 +15,13 @@
                 </div>
             </div>
             <div class="mt-3">
-                <div class="row ml-1 mt-1"><h5 class="mt-1">Created By : <a href="">{{allAlbums.user.name}}</a></h5><button class="btn btn-outline-primary btn-sm ml-3" @click="userFollowUnfollow(allAlbums.user.id)">{{allAlbums.user.followers}}</button></div>
+                <div class="row ml-1 mt-1"><h5 class="mt-1">Created By : <a href="">{{allAlbums.user.name}}</a></h5><button class="btn btn-outline-info btn-sm ml-3" id="follow-btn" @click="userFollowUnfollow(allAlbums.user.id)" v-if="allAlbums.user.id!=$userId"></button>
+                  
+                </div>
                 <h4 class="mt-4">{{allAlbums.name}}</h4> 
                 <h5>{{allAlbums.description}}</h5>
             </div>
+           <div id="comment-box" style="display:none;">
            <div class="container">
                 <div class="row mt-5">
                     <h5 class="">2 Comments</h5>
@@ -26,7 +29,7 @@
                 </div>
                 <hr style="border-top: 1.1px solid black" class="mt-1">
            </div>
-          <div class=" container">
+          <div class=" container"  >
               <div class="col-md-8 ">
                     <div class="panel panel-info">                       
                         <div class="panel-body">
@@ -100,6 +103,7 @@
 
               </div>
           </div>
+          </div>
 
         </div>
     </div>
@@ -107,7 +111,28 @@
 </template>
 <script>
     export default {
+
         props:['allAlbums'],
+        created(){
+          axios.post('/user/follow-unfollow/'+this.allAlbums.user.id).then(response=>{
+                    this.fetchFollowUnfollow=response.data;
+
+                    if (this.$userId==this.allAlbums.user.id) {
+                         $('#comment-box').show();
+                    }else{
+                      document.getElementById('follow-btn').innerHTML=response.data;
+                    }
+                    if (this.fetchFollowUnfollow=='Unfollow') {
+                        $('#comment-box').show();
+                    }
+                     if (this.fetchFollowUnfollow=='follow') {
+                        $('#comment-box').hide();
+                    }
+
+          }).catch(error=>{
+               console.log(error);
+          });
+        },
         mounted() {
            axios.get('/comment/'+this.allAlbums.id).then(response=>{
 
@@ -117,20 +142,33 @@
            }).catch(error=>{
               console.log(error);
            });
-           
+                     
         },
+
         data(){
          return {
             replyField:'',
             AllComments:[],
             AllReply:[],
+            fetchFollowUnfollow:'',
+
          }
         },
         methods:{
           userFollowUnfollow(id){
 
              axios.post('/follow-unfollow/'+id).then(response=>{
-                 console.log(response);
+                this.fetchFollowUnfollow=response.data;
+                document.getElementById('follow-btn').innerHTML=response.data;
+               // $('#follow-btn').html(response.data);
+               if (this.fetchFollowUnfollow=='Unfollow') {
+                   $('#comment-box').show();
+               }
+                if (this.fetchFollowUnfollow=='follow') {
+                   $('#comment-box').hide();
+               }
+               
+                 console.log(this.fetchFollowUnfollow);
              }).catch(error=>{
               console.log(error.response);
              });
@@ -172,7 +210,7 @@
             console.log(error);
            });
           },
-        }
+        },
         
     }
 </script >

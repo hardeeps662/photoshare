@@ -7,6 +7,7 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+Vue.prototype.$userId = document.querySelector("meta[name='user-id']").getAttribute('content');
 
 import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate);

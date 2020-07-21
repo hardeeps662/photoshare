@@ -91,11 +91,26 @@ class FrontendController extends Controller
         //
     }
 
+    public function showfollowUnfollowButton($id){
+
+           $user=\App\User::find($id);
+            if (Auth::user()->isFollowing($user)) {
+                return 'Unfollow';
+            }else{
+               return 'Follow';
+            }
+    }
+
      public function followUnfollow($id)
     {
         $user=\App\User::find($id);
          $response=Auth::user()->toggleFollow($user);
-         return $response;
+         if (Auth::user()->isFollowing($user)) {
+             return 'Unfollow';
+         }else{
+            return 'follow';
+         }
+
     }
 
 }

@@ -2634,13 +2634,40 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['allAlbums'],
-  mounted: function mounted() {
+  created: function created() {
     var _this = this;
 
+    axios.post('/user/follow-unfollow/' + this.allAlbums.user.id).then(function (response) {
+      _this.fetchFollowUnfollow = response.data;
+
+      if (_this.$userId == _this.allAlbums.user.id) {
+        $('#comment-box').show();
+      } else {
+        document.getElementById('follow-btn').innerHTML = response.data;
+      }
+
+      if (_this.fetchFollowUnfollow == 'Unfollow') {
+        $('#comment-box').show();
+      }
+
+      if (_this.fetchFollowUnfollow == 'follow') {
+        $('#comment-box').hide();
+      }
+    })["catch"](function (error) {
+      console.log(error);
+    });
+  },
+  mounted: function mounted() {
+    var _this2 = this;
+
     axios.get('/comment/' + this.allAlbums.id).then(function (response) {
-      _this.AllComments = response.data; //this.AllComments.forEach(element => console.log(element.replies));
+      _this2.AllComments = response.data; //this.AllComments.forEach(element => console.log(element.replies));
     })["catch"](function (error) {
       console.log(error);
     });
@@ -2649,13 +2676,27 @@ __webpack_require__.r(__webpack_exports__);
     return {
       replyField: '',
       AllComments: [],
-      AllReply: []
+      AllReply: [],
+      fetchFollowUnfollow: ''
     };
   },
   methods: {
     userFollowUnfollow: function userFollowUnfollow(id) {
+      var _this3 = this;
+
       axios.post('/follow-unfollow/' + id).then(function (response) {
-        console.log(response);
+        _this3.fetchFollowUnfollow = response.data;
+        document.getElementById('follow-btn').innerHTML = response.data; // $('#follow-btn').html(response.data);
+
+        if (_this3.fetchFollowUnfollow == 'Unfollow') {
+          $('#comment-box').show();
+        }
+
+        if (_this3.fetchFollowUnfollow == 'follow') {
+          $('#comment-box').hide();
+        }
+
+        console.log(_this3.fetchFollowUnfollow);
       })["catch"](function (error) {
         console.log(error.response);
       });
@@ -2664,16 +2705,16 @@ __webpack_require__.r(__webpack_exports__);
       this.replyField = id;
     },
     showReply: function showReply(value) {
-      var _this2 = this;
+      var _this4 = this;
 
       axios.get('/reply' + value).then(function (response) {
-        _this2.AllReply = response.data;
+        _this4.AllReply = response.data;
       })["catch"](function (error) {
         console.log(error.response);
       });
     },
     sendReply: function sendReply(id) {
-      var _this3 = this;
+      var _this5 = this;
 
       var form = document.getElementById('reply_form-' + id);
       console.log(form);
@@ -2681,21 +2722,21 @@ __webpack_require__.r(__webpack_exports__);
       formdata.append('album_id', this.allAlbums.id);
       axios.post('/reply/' + id, formdata).then(function (response) {
         $('#reply_text').val("");
-        _this3.AllComments = response.data;
+        _this5.AllComments = response.data;
       })["catch"](function (error) {
         console.log(error.response);
       });
     },
     sendMessage: function sendMessage() {
-      var _this4 = this;
+      var _this6 = this;
 
       var form = document.getElementById('comment_form');
       var formdata = new FormData(form);
       console.log(formdata);
       axios.post('/comment/' + this.allAlbums.id, formdata).then(function (response) {
         $('#text').val("");
-        _this4.AllComments = response.data[0];
-        console.log(_this4.AllComments);
+        _this6.AllComments = response.data[0];
+        console.log(_this6.AllComments);
       })["catch"](function (error) {
         console.log(error);
       });
@@ -54739,7 +54780,7 @@ var render = function() {
                         staticStyle: { "border-radius": "1px" },
                         attrs: {
                           src: "/storage/album_image/" + album.photo,
-                          width: "170px",
+                          width: "  170px",
                           height: "140px"
                         }
                       })
@@ -54760,18 +54801,17 @@ var render = function() {
                 _vm._v(_vm._s(_vm.allAlbums.user.name))
               ])
             ]),
-            _c(
-              "button",
-              {
-                staticClass: "btn btn-outline-primary btn-sm ml-3",
-                on: {
-                  click: function($event) {
-                    return _vm.userFollowUnfollow(_vm.allAlbums.user.id)
+            _vm.allAlbums.user.id != _vm.$userId
+              ? _c("button", {
+                  staticClass: "btn btn-outline-info btn-sm ml-3",
+                  attrs: { id: "follow-btn" },
+                  on: {
+                    click: function($event) {
+                      return _vm.userFollowUnfollow(_vm.allAlbums.user.id)
+                    }
                   }
-                }
-              },
-              [_vm._v(_vm._s(_vm.allAlbums.user.followers))]
-            )
+                })
+              : _vm._e()
           ]),
           _vm._v(" "),
           _c("h4", { staticClass: "mt-4" }, [
@@ -54781,246 +54821,262 @@ var render = function() {
           _c("h5", [_vm._v(_vm._s(_vm.allAlbums.description))])
         ]),
         _vm._v(" "),
-        _vm._m(0),
-        _vm._v(" "),
-        _c("div", { staticClass: " container" }, [
-          _c("div", { staticClass: "col-md-8 " }, [
-            _c("div", { staticClass: "panel panel-info" }, [
-              _c(
-                "div",
-                { staticClass: "panel-body" },
-                [
-                  _c("div", { staticClass: "row" }, [
-                    _vm._m(1),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "col-md-11 " }, [
-                      _c("div", { staticClass: "container" }, [
-                        _c(
-                          "form",
-                          {
-                            attrs: { id: "comment_form" },
-                            on: {
-                              keydown: function($event) {
-                                if (
-                                  !$event.type.indexOf("key") &&
-                                  _vm._k(
-                                    $event.keyCode,
-                                    "enter",
-                                    13,
-                                    $event.key,
-                                    "Enter"
-                                  )
-                                ) {
-                                  return null
-                                }
-                                if (
-                                  $event.ctrlKey ||
-                                  $event.shiftKey ||
-                                  $event.altKey ||
-                                  $event.metaKey
-                                ) {
-                                  return null
-                                }
-                                $event.preventDefault()
-                                return _vm.sendMessage($event)
-                              }
-                            }
-                          },
-                          [
-                            _c("textarea", {
-                              staticClass: "form-control",
-                              staticStyle: {
-                                "border-radius": "15px",
-                                height: "45px"
-                              },
-                              attrs: {
-                                name: "comment",
-                                id: "text",
-                                required: "",
-                                placeholder: "write a comment...",
-                                rows: "2"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("input", {
-                              staticStyle: { display: "none" },
-                              attrs: { type: "submit" }
-                            })
-                          ]
-                        )
-                      ])
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "clearfix" }),
-                  _vm._v(" "),
-                  _c("hr"),
-                  _vm._v(" "),
-                  _vm._l(_vm.AllComments, function(comment) {
-                    return _c(
-                      "div",
-                      { staticClass: "media-list mt-2 " },
-                      [
-                        _c("li", { staticClass: "media" }, [
-                          _vm._m(2, true),
-                          _vm._v(" "),
+        _c(
+          "div",
+          { staticStyle: { display: "none" }, attrs: { id: "comment-box" } },
+          [
+            _vm._m(0),
+            _vm._v(" "),
+            _c("div", { staticClass: " container" }, [
+              _c("div", { staticClass: "col-md-8 " }, [
+                _c("div", { staticClass: "panel panel-info" }, [
+                  _c(
+                    "div",
+                    { staticClass: "panel-body" },
+                    [
+                      _c("div", { staticClass: "row" }, [
+                        _vm._m(1),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-11 " }, [
                           _c("div", { staticClass: "container" }, [
-                            _c("div", { staticClass: "breadcrumb " }, [
-                              _c("strong", { staticClass: "text-dark" }, [
-                                _vm._v(_vm._s(comment.user.name))
-                              ]),
-                              _vm._v(" "),
-                              _c(
-                                "span",
-                                { staticClass: "text-muted float-right mr-3" },
-                                [
-                                  _c("small", { staticClass: "text-primary" }, [
-                                    _vm._v(_vm._s(comment.created_at))
-                                  ])
-                                ]
-                              ),
-                              _vm._v(" "),
-                              _c("p", [_vm._v(_vm._s(comment.comment))])
-                            ])
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _c(
-                          "a",
-                          {
-                            staticClass: "text-info font-weight-bold",
-                            staticStyle: {
-                              "margin-left": "95px",
-                              "margin-top": "10px"
-                            },
-                            attrs: { href: "#" },
-                            on: {
-                              click: function($event) {
-                                $event.preventDefault()
-                                return _vm.ReplyToComment(comment.id)
-                              }
-                            }
-                          },
-                          [_vm._v("Reply")]
-                        ),
-                        _vm._v(" "),
-                        _vm.replyField == comment.id
-                          ? _c("div", { staticClass: "col-md-12 mt-1" }, [
-                              _c("div", { staticClass: "row" }, [
-                                _vm._m(3, true),
+                            _c(
+                              "form",
+                              {
+                                attrs: { id: "comment_form" },
+                                on: {
+                                  keydown: function($event) {
+                                    if (
+                                      !$event.type.indexOf("key") &&
+                                      _vm._k(
+                                        $event.keyCode,
+                                        "enter",
+                                        13,
+                                        $event.key,
+                                        "Enter"
+                                      )
+                                    ) {
+                                      return null
+                                    }
+                                    if (
+                                      $event.ctrlKey ||
+                                      $event.shiftKey ||
+                                      $event.altKey ||
+                                      $event.metaKey
+                                    ) {
+                                      return null
+                                    }
+                                    $event.preventDefault()
+                                    return _vm.sendMessage($event)
+                                  }
+                                }
+                              },
+                              [
+                                _c("textarea", {
+                                  staticClass: "form-control",
+                                  staticStyle: {
+                                    "border-radius": "15px",
+                                    height: "45px"
+                                  },
+                                  attrs: {
+                                    name: "comment",
+                                    id: "text",
+                                    required: "",
+                                    placeholder: "write a comment...",
+                                    rows: "2"
+                                  }
+                                }),
                                 _vm._v(" "),
-                                _c("div", { staticClass: "ml-2" }, [
-                                  _c("div", {}, [
-                                    _c(
-                                      "form",
-                                      {
-                                        attrs: {
-                                          id: "reply_form-" + comment.id
-                                        },
-                                        on: {
-                                          keydown: function($event) {
-                                            if (
-                                              !$event.type.indexOf("key") &&
-                                              _vm._k(
-                                                $event.keyCode,
-                                                "enter",
-                                                13,
-                                                $event.key,
-                                                "Enter"
-                                              )
-                                            ) {
-                                              return null
-                                            }
-                                            if (
-                                              $event.ctrlKey ||
-                                              $event.shiftKey ||
-                                              $event.altKey ||
-                                              $event.metaKey
-                                            ) {
-                                              return null
-                                            }
-                                            $event.preventDefault()
-                                            return _vm.sendReply(comment.id)
-                                          }
-                                        }
-                                      },
-                                      [
-                                        _c("textarea", {
-                                          staticClass: "form-control",
-                                          staticStyle: {
-                                            "border-radius": "15px",
-                                            height: "45px",
-                                            width: "517px"
-                                          },
-                                          attrs: {
-                                            name: "reply",
-                                            id: "reply_text",
-                                            placeholder: "write a comment...",
-                                            rows: "2"
-                                          }
-                                        }),
-                                        _vm._v(" "),
-                                        _c("input", {
-                                          staticStyle: { display: "none" },
-                                          attrs: { type: "submit" }
-                                        })
-                                      ]
-                                    )
-                                  ])
+                                _c("input", {
+                                  staticStyle: { display: "none" },
+                                  attrs: { type: "submit" }
+                                })
+                              ]
+                            )
+                          ])
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "clearfix" }),
+                      _vm._v(" "),
+                      _c("hr"),
+                      _vm._v(" "),
+                      _vm._l(_vm.AllComments, function(comment) {
+                        return _c(
+                          "div",
+                          { staticClass: "media-list mt-2 " },
+                          [
+                            _c("li", { staticClass: "media" }, [
+                              _vm._m(2, true),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "container" }, [
+                                _c("div", { staticClass: "breadcrumb " }, [
+                                  _c("strong", { staticClass: "text-dark" }, [
+                                    _vm._v(_vm._s(comment.user.name))
+                                  ]),
+                                  _vm._v(" "),
+                                  _c(
+                                    "span",
+                                    {
+                                      staticClass: "text-muted float-right mr-3"
+                                    },
+                                    [
+                                      _c(
+                                        "small",
+                                        { staticClass: "text-primary" },
+                                        [_vm._v(_vm._s(comment.created_at))]
+                                      )
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _c("p", [_vm._v(_vm._s(comment.comment))])
                                 ])
                               ])
-                            ])
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _vm._l(comment.replies, function(reply) {
-                          return _c(
-                            "div",
-                            {
-                              staticClass: "media ",
-                              staticStyle: {
-                                "margin-left": "90px",
-                                "margin-top": "10px"
-                              }
-                            },
-                            [
-                              _vm._m(4, true),
-                              _vm._v(" "),
-                              _c("div", { staticClass: "breadcrumb ml-2" }, [
-                                _c(
-                                  "strong",
-                                  { staticClass: "media-heading title" },
-                                  [_vm._v(_vm._s(reply.user.name))]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "span",
-                                  {
-                                    staticClass: "text-muted float-right mr-2"
-                                  },
-                                  [
-                                    _c(
-                                      "small",
-                                      { staticClass: "text-primary" },
-                                      [_vm._v(_vm._s(reply.created_at))]
-                                    )
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _c("p", [_vm._v(_vm._s(reply.reply))])
-                              ])
-                            ]
-                          )
-                        })
-                      ],
-                      2
-                    )
-                  })
-                ],
-                2
-              )
+                            ]),
+                            _vm._v(" "),
+                            _c(
+                              "a",
+                              {
+                                staticClass: "text-info font-weight-bold",
+                                staticStyle: {
+                                  "margin-left": "95px",
+                                  "margin-top": "10px"
+                                },
+                                attrs: { href: "#" },
+                                on: {
+                                  click: function($event) {
+                                    $event.preventDefault()
+                                    return _vm.ReplyToComment(comment.id)
+                                  }
+                                }
+                              },
+                              [_vm._v("Reply")]
+                            ),
+                            _vm._v(" "),
+                            _vm.replyField == comment.id
+                              ? _c("div", { staticClass: "col-md-12 mt-1" }, [
+                                  _c("div", { staticClass: "row" }, [
+                                    _vm._m(3, true),
+                                    _vm._v(" "),
+                                    _c("div", { staticClass: "ml-2" }, [
+                                      _c("div", {}, [
+                                        _c(
+                                          "form",
+                                          {
+                                            attrs: {
+                                              id: "reply_form-" + comment.id
+                                            },
+                                            on: {
+                                              keydown: function($event) {
+                                                if (
+                                                  !$event.type.indexOf("key") &&
+                                                  _vm._k(
+                                                    $event.keyCode,
+                                                    "enter",
+                                                    13,
+                                                    $event.key,
+                                                    "Enter"
+                                                  )
+                                                ) {
+                                                  return null
+                                                }
+                                                if (
+                                                  $event.ctrlKey ||
+                                                  $event.shiftKey ||
+                                                  $event.altKey ||
+                                                  $event.metaKey
+                                                ) {
+                                                  return null
+                                                }
+                                                $event.preventDefault()
+                                                return _vm.sendReply(comment.id)
+                                              }
+                                            }
+                                          },
+                                          [
+                                            _c("textarea", {
+                                              staticClass: "form-control",
+                                              staticStyle: {
+                                                "border-radius": "15px",
+                                                height: "45px",
+                                                width: "517px"
+                                              },
+                                              attrs: {
+                                                name: "reply",
+                                                id: "reply_text",
+                                                placeholder:
+                                                  "write a comment...",
+                                                rows: "2"
+                                              }
+                                            }),
+                                            _vm._v(" "),
+                                            _c("input", {
+                                              staticStyle: { display: "none" },
+                                              attrs: { type: "submit" }
+                                            })
+                                          ]
+                                        )
+                                      ])
+                                    ])
+                                  ])
+                                ])
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _vm._l(comment.replies, function(reply) {
+                              return _c(
+                                "div",
+                                {
+                                  staticClass: "media ",
+                                  staticStyle: {
+                                    "margin-left": "90px",
+                                    "margin-top": "10px"
+                                  }
+                                },
+                                [
+                                  _vm._m(4, true),
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    { staticClass: "breadcrumb ml-2" },
+                                    [
+                                      _c(
+                                        "strong",
+                                        { staticClass: "media-heading title" },
+                                        [_vm._v(_vm._s(reply.user.name))]
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "span",
+                                        {
+                                          staticClass:
+                                            "text-muted float-right mr-2"
+                                        },
+                                        [
+                                          _c(
+                                            "small",
+                                            { staticClass: "text-primary" },
+                                            [_vm._v(_vm._s(reply.created_at))]
+                                          )
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _c("p", [_vm._v(_vm._s(reply.reply))])
+                                    ]
+                                  )
+                                ]
+                              )
+                            })
+                          ],
+                          2
+                        )
+                      })
+                    ],
+                    2
+                  )
+                ])
+              ])
             ])
-          ])
-        ])
+          ]
+        )
       ])
     ])
   ])
@@ -67505,6 +67561,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+Vue.prototype.$userId = document.querySelector("meta[name='user-id']").getAttribute('content');
 
 Vue.use(vee_validate__WEBPACK_IMPORTED_MODULE_0__["default"]);
  // If you don't need the styles, do not connect
